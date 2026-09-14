@@ -1,0 +1,10 @@
+Orbit — Earth Explorer
+Copyright 2026 Matt Curfman, Spunky Tensor LLC
+
+Original project code and documentation are licensed under the Apache License,
+Version 2.0. Third-party code, photographs, data, fonts, and marks retain their
+respective terms; see THIRD_PARTY_NOTICES.md and the bundled dependency notices.
+
+This project uses CesiumJS and Lucide. No endorsement by their authors or by
+imagery, data, or service providers is implied. The Apache license does not
+grant rights to third-party services or trademarks.
