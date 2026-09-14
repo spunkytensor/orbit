@@ -1,0 +1,7 @@
+services:
+  web:
+    command: npm run dev -- --port "$PORT" --strictPort
+    health: /
+    portal:
+      title: Orbit Earth Explorer
+      description: Globe preview. External imagery and search require Internet access and WebGL.

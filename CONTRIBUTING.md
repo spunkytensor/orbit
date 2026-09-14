@@ -19,6 +19,24 @@ command; match the surrounding TypeScript and CSS style. Keep `package-lock.json
 in sync when changing dependencies. Do not commit `node_modules/`, `dist/`, secrets,
 or local environment files.
 
+## Amp orbs
+
+`.agents/setup` checks the orb's preinstalled Node.js (22.12+) and npm, then
+installs locked dependencies, including build and test tools. Amp snapshots this
+environment: an exact snapshot skips setup, while a stale snapshot reruns the
+install using npm's preserved download cache. No secrets, environment files,
+databases, or additional system packages are required.
+
+`.agents/resume` only checks that the tools are still installed; it never installs
+dependencies or starts servers. If dependencies were removed, run `.agents/setup`
+to repair them. Run `npm test` and `npm run build` to validate the environment.
+
+Start the supervised Vite preview with `amp orb services ensure`. The service in
+`.amp/services.yaml` uses Amp's assigned port and checks HTTP readiness. Open the
+printed portal URL rather than a localhost URL. Generated portal state is ignored
+by Git. Setup changes take effect for future orbs after reaching the Amp project's
+default branch; no manual snapshot deletion is needed.
+
 ## Submitting changes
 
 1. Create a focused branch from the current default branch.
