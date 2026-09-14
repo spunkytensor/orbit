@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.."
+
+# No authentication or backing services are needed. Never install on wake.
+if [[ ! -x node_modules/.bin/vite || ! -x node_modules/.bin/tsc || ! -x node_modules/.bin/vitest ]]; then
+  echo "Orb dependencies are missing; run .agents/setup to repair them." >&2
+  exit 1
+fi

@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.."
+
+echo "Checking the orb's preinstalled Node.js and npm toolchain..."
+node --input-type=module -e '
+  const [major, minor] = process.versions.node.split(".").map(Number);
+  if (major < 22 || (major === 22 && minor < 12)) {
+    throw new Error("Orbit requires Node.js 22.12 or newer.");
+  }
+'
+node --version
+npm --version
+
+# Exact project snapshots retain node_modules and skip setup altogether.
+# Stale snapshots rerun this fast, lockfile-enforced install using npm's cache.
+echo "Installing locked dependencies (including build and test tools)..."
+time npm ci --include=dev --prefer-offline --no-audit --no-fund
+echo "Orb setup complete. Run npm test, npm run build, or amp orb services ensure."
