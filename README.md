@@ -28,12 +28,16 @@ this does not prevent publishing the source repository under Apache-2.0.
 Use Node.js 22.12+ (tested with Node 26).
 
 ```sh
-npm ci
+node scripts/check-release-age.mjs && npm ci
 npm run dev
 npm test
 npm run build
 npm run preview
 ```
+
+Package versions must be at least 72 hours old before installation. Use npm
+11.10.0+ for dependency updates and follow the
+[dependency quarantine workflow](CONTRIBUTING.md#three-day-dependency-quarantine).
 
 Deploy the generated `dist/` directory to a static web host at its root. The build copies Cesium workers, star maps, and the Natural Earth fallback into `dist/cesium/`; keep that directory with the app. No backend is required. External imagery and search need an Internet connection and a browser with WebGL enabled.
 

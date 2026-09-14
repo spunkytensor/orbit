@@ -30,6 +30,10 @@ jobs:
         with:
           node-version: ${{ matrix.node }}
           cache: npm
+      - name: Test and enforce 72-hour package release minimum
+        run: |
+          node --test scripts/release-age.check.mjs
+          node scripts/check-release-age.mjs
       - run: npm ci --no-audit --no-fund
       - name: Regression tests
         run: npm test -- --reporter=default --reporter=junit --outputFile=reports/vitest.xml

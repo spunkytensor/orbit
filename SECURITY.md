@@ -23,6 +23,15 @@ the maintainer after a fix or mitigation is available.
 
 ## Automated security checks
 
+All npm package versions must be at least 72 hours old before installation.
+`.npmrc` filters new resolutions with npm 11.10.0+, and CI/orb setup validate
+every locked version against live registry publication timestamps before `npm ci`.
+Missing metadata, unsupported sources, and registry failures block installation.
+Dependabot has a three-day version-update cooldown; its security updates bypass
+that cooldown but do not bypass our CI check. Require both regression jobs in
+branch protection to enforce this on merges. Local installation instructions in
+CONTRIBUTING.md use the same preflight; bare npm commands can bypass it.
+
 `.github/workflows/security.yml` adapts Reel Maestro's separate audit and
 CycloneDX evidence pattern to npm. It scans the complete committed lockfile,
 including development and optional dependencies, without installing project

@@ -15,6 +15,7 @@ npm --version
 
 # Exact project snapshots retain node_modules and skip setup altogether.
 # Stale snapshots rerun this fast, lockfile-enforced install using npm's cache.
+node scripts/check-release-age.mjs
 echo "Installing locked dependencies (including build and test tools)..."
 time npm ci --include=dev --prefer-offline --no-audit --no-fund
 echo "Orb setup complete. Run npm test, npm run build, or amp orb services ensure."

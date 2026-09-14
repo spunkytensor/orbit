@@ -5,10 +5,11 @@ welcome. Discuss large features or new dependencies with a maintainer first.
 
 ## Local development
 
-Use Node.js 22.12 or newer and npm:
+Use Node.js 22.12 or newer. Use npm 11.10.0 or newer when resolving dependency
+updates so npm honors the repository's `min-release-age=3` setting:
 
 ```sh
-npm ci
+node scripts/check-release-age.mjs && npm ci
 npm run dev
 npm test
 npm run build
@@ -18,6 +19,22 @@ The build runs TypeScript checking. There is currently no separate lint or forma
 command; match the surrounding TypeScript and CSS style. Keep `package-lock.json`
 in sync when changing dependencies. Do not commit `node_modules/`, `dist/`, secrets,
 or local environment files.
+
+### Three-day dependency quarantine
+
+Never install a package version published less than 72 hours ago, including
+development, optional, transitive, and security updates. There are no exemptions.
+For updates, use `npm install --package-lock-only --ignore-scripts` (with package
+arguments as needed) or `npm update --package-lock-only --ignore-scripts`, then
+run `node scripts/check-release-age.mjs && npm ci`. Resolve metadata first; do not
+download new package contents before validating the resulting lockfile.
+
+Bare `npm ci` and unchanged lockfile entries bypass npm's native age filter, so
+always use the preflight command above. CI and orb setup run it before installation.
+It requires live npm registry metadata, fails closed on missing timestamps or
+network errors, and rejects non-registry dependencies whose age cannot be verified.
+Older npm can perform a preflight-approved locked install, but must not resolve
+updates: it does not understand `.npmrc`'s minimum-age setting.
 
 ## Automated checks
 
