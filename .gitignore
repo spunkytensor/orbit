@@ -1,5 +1,6 @@
 node_modules/
 dist/
+reports/
 .amp/in/
 .amp/portals/
 .env

@@ -19,6 +19,28 @@ command; match the surrounding TypeScript and CSS style. Keep `package-lock.json
 in sync when changing dependencies. Do not commit `node_modules/`, `dist/`, secrets,
 or local environment files.
 
+## Automated checks
+
+GitHub Actions runs `npm ci`, all Vitest regressions, the strict TypeScript check
+and production build on Node 22 and 24 for pull requests and pushes to `main`.
+After building, run `node --test scripts/check-dist.mjs` to verify emitted JS/CSS,
+Cesium assets, legal documents, and the runtime license inventory. These are
+offline packaging checks, not a browser/WebGL end-to-end test; the manual browser
+checks below still apply. JUnit results are retained for 14 days.
+
+The CVE/SBOM workflow also runs weekly and on manual dispatch. Reproduce its
+security checks with the pinned npm version (no project dependency changes):
+
+```sh
+mkdir -p reports/security
+npx --yes npm@11.6.2 sbom --package-lock-only --sbom-format=cyclonedx --sbom-type=application > reports/security/orbit-sbom.cdx.json
+npx --yes npm@11.6.2 audit --package-lock-only --audit-level=high --json > reports/security/npm-audit.json
+```
+
+See [SECURITY.md](SECURITY.md#automated-security-checks) for the gating policy and
+repository settings needed to enforce it. Dependabot opens weekly npm and GitHub
+Actions updates; review them and require the same regression checks as other PRs.
+
 ## Amp orbs
 
 `.agents/setup` checks the orb's preinstalled Node.js (22.12+) and npm, then

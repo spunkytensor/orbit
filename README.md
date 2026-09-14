@@ -1,5 +1,8 @@
 # Orbit — Earth Explorer
 
+[![CI](https://github.com/spunkytensor/orbit/actions/workflows/ci.yml/badge.svg)](https://github.com/spunkytensor/orbit/actions/workflows/ci.yml)
+[![CVE Audit](https://github.com/spunkytensor/orbit/actions/workflows/security.yml/badge.svg)](https://github.com/spunkytensor/orbit/actions/workflows/security.yml)
+
 A TypeScript / Vite / CesiumJS globe with WebGL rendering, streamed satellite imagery, a real astronomical star map, place search, and a minimal responsive interface. No API keys are required for the configured public endpoints.
 
 ![Orbit Earth Explorer showing Africa, Europe, and the Middle East, with place search, globe controls, and a Dolomites destination card.](docs/images/orbit-earth-explorer.png)
