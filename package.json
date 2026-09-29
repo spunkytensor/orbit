@@ -24,7 +24,7 @@
     "lucide": "^0.468.0"
   },
   "devDependencies": {
-    "typescript": "^5.8.3",
+    "typescript": "^7.0.2",
     "vite": "^6.3.5",
     "vite-plugin-static-copy": "^2.3.1",
     "vitest": "^4.1.11"
