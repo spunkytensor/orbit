@@ -36,13 +36,14 @@ versions below 11.10.0. The pinned npm bootstrap itself verifies publication age
 
 `.github/workflows/public-repo-security.yml` is named **Spunky Tensor security**.
 It calls the shared Trivy workflow pinned to
-`69b5f260fb4358acb0e2f7b2a96254ad9cc2322c` and retains the separate npm audit and
+`ed53814ed23f76c11fa4a91f57f99de903c18bfc` (workflow and `baseline-sha` input) and retains the separate npm audit and
 CycloneDX evidence. The npm audit scans the complete committed lockfile,
 including development and optional dependencies, without installing project
 packages or executing their lifecycle scripts. The npm version pinned in
 `package.json` supplies the npm audit and npm SBOM tooling.
 Both scans run on PRs, pushes to `main`, published releases, nightly at 09:29 UTC,
-and manual dispatch. Dependency review additionally gates PR dependency changes.
+and manual dispatch. Full-inventory scanning replaces the GitHub dependency-review
+service gate; no Dependency Graph or paid private security add-on is required.
 Trivy includes development dependencies, rejects empty inventories, retains all
 severities, and blocks High/Critical findings including unfixed vulnerabilities.
 Caller ignore/config files cannot suppress its shared policy.
@@ -62,28 +63,29 @@ as release assets after a successful audit, independent of CI artifact expiry.
 License inventory
 checks verify packaging, not a legal license allowlist or approval.
 
-CodeQL runs JavaScript/TypeScript security-extended analysis on PRs, `main`, weekly,
+Optional, public-only CodeQL runs JavaScript/TypeScript security-extended analysis on PRs, `main`, weekly,
 and on demand. Findings appear in GitHub code scanning; successful analysis alone
 does not mean no vulnerabilities were found. Actions use immutable commit pins,
 read-only permissions except CodeQL result upload and the release-only evidence
 upload, and bounded job timeouts. Existing npm, regression, and CodeQL jobs use
 Blacksmith Ubuntu 24.04 runners; the repository must have access to that
-integration. Trivy and dependency review use GitHub-hosted Ubuntu 24.04.
+integration. Trivy uses GitHub-hosted Ubuntu 24.04. Actions minutes/storage and
+existing runner billing still apply; this is not a promise of zero CI costs.
 
 Maintainers should enable dependency graph/Dependabot alerts, private vulnerability
 reporting, secret scanning and push protection in GitHub settings where available.
 Configure branch rules to require both Node regression jobs and the npm audit,
-and a code-scanning merge protection rule for CodeQL findings. Workflows alone do
-not enforce branch protection. CodeQL requires code scanning enabled (and GitHub
-Code Security entitlement if the repository becomes private). Do not enable both
-default CodeQL setup and this advanced workflow. Repository settings are not
-changed by these files.
+with the shared Trivy check. Workflows alone do not enforce branch protection.
+CodeQL is supplemental and skips private repositories instead of requiring GitHub
+Code Security. Trivy/npm audit do not replace its dataflow analysis. Do not require
+this optional check or a paid code-scanning rule for baseline adoption. Repository
+settings are not changed by these files.
 
 ## Baseline adoption and remaining gates
 
 Maintainer: Matt Curfman / Spunky Tensor. Supported code remains the latest default
 branch only, as described above; there are no separately supported release lines.
-The [shared baseline](https://github.com/spunkytensor/.github/blob/69b5f260fb4358acb0e2f7b2a96254ad9cc2322c/docs/baseline.md)
+The [shared baseline](https://github.com/spunkytensor/.github/blob/ed53814ed23f76c11fa4a91f57f99de903c18bfc/docs/baseline.md)
 defines adoption requirements, not a compliance certification.
 
 Trivy's `security-source` artifact retains SPDX and CycloneDX SBOMs, full JSON,
@@ -103,10 +105,11 @@ obtained by the browser, not shipped by Orbit; their terms still apply.
 
 Before claiming full adoption, maintainers must:
 
-- Verify dependency graph, alerts/security updates, private reporting, secret
-  scanning/push protection, branch and code-scanning rules, workflow/policy owners,
-  2FA and access reviews. Require the real Trivy and dependency-review check names
-  alongside existing npm and regression checks; do not remove stronger checks.
+- Verify branch rules, workflow/policy owners, 2FA and access reviews. Require the
+  real Trivy check alongside existing npm and regression checks; remove obsolete
+  dependency-review requirements if configured. Free GitHub security features may
+  supplement the baseline but are not prerequisites. Private reports stay in the
+  caller's private Actions artifacts, never the public organization reporter.
 - Establish and test the private reporting route. Assign vulnerability findings
   an owner and remediation date; exceptions also need reviewer, scope, evidence,
   expiry and tracking reference. The shared scanner currently has no exceptions.
