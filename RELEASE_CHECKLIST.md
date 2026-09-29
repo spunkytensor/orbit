@@ -34,3 +34,11 @@ security audit has already occurred.
 - [ ] Publish a version/tag and release notes only after the above checks pass.
 - [ ] Verify the release's security workflow succeeds and attaches the lockfile
   SBOM and audit evidence to the release. These assets outlive CI artifact expiry.
+- [ ] Verify **Spunky Tensor security** publishes both source SBOM formats and
+  scanner identity/checksums. Reconcile them with the exact distributed `dist/`
+  bundle, including Cesium's nested components and assets; publish bundle
+  checksums, notices (including `licenses/THIRD_PARTY_NOTICES.txt`), and
+  digest-bound build provenance. The current source scan does not do this.
+- [ ] Resolve the [baseline adoption gates](SECURITY.md#baseline-adoption-and-remaining-gates),
+  including required checks, workflow/policy ownership, legal review, and verified
+  nightly scan freshness. Never treat a green caller as full compliance.

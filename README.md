@@ -1,7 +1,6 @@
 # Orbit — Earth Explorer
 
 [![CI](https://github.com/spunkytensor/orbit/actions/workflows/ci.yml/badge.svg)](https://github.com/spunkytensor/orbit/actions/workflows/ci.yml)
-[![CVE Audit](https://github.com/spunkytensor/orbit/actions/workflows/security.yml/badge.svg)](https://github.com/spunkytensor/orbit/actions/workflows/security.yml)
 
 A TypeScript / Vite / CesiumJS globe with WebGL rendering, streamed satellite imagery, a real astronomical star map, place search, and a minimal responsive interface. No API keys are required for the configured public endpoints.
 
@@ -17,6 +16,11 @@ is non-commercial, and Esri imagery has its own deployment terms.
 
 - [Contributing and community expectations](CONTRIBUTING.md)
 - [Security policy and vulnerability reporting](SECURITY.md)
+- [Supported versions](SECURITY.md#supported-versions)
+- [Spunky Tensor security scans](https://github.com/spunkytensor/orbit/actions/workflows/public-repo-security.yml)
+- [SBOM release downloads](https://github.com/spunkytensor/orbit/releases) — source/build
+  SPDX and CycloneDX evidence on future successful releases, not deployed-bundle
+  attestations; see [remaining adoption gates](SECURITY.md#baseline-adoption-and-remaining-gates).
 - [Privacy and external requests](PRIVACY.md)
 - [Maintainer public-release checklist](RELEASE_CHECKLIST.md)
 

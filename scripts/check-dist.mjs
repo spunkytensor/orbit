@@ -26,6 +26,10 @@ test("Cesium runtime directories are shipped", async () => {
 });
 
 test("legal documents and runtime dependency licenses match the lockfile", async () => {
+  assert.equal(
+    await readFile(new URL("licenses/THIRD_PARTY_NOTICES.txt", dist), "utf8"),
+    await readFile(new URL("THIRD_PARTY_NOTICES.md", root), "utf8"),
+  );
   for (const file of ["LICENSE", "NOTICE", "THIRD_PARTY_NOTICES.md", "PRIVACY.md"]) {
     assert.equal(
       await readFile(new URL(`licenses/${file}`, dist), "utf8"),

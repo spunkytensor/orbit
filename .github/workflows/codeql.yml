@@ -17,6 +17,8 @@ concurrency:
 
 jobs:
   analyze:
+    # Optional public-repository coverage; never require a paid private entitlement.
+    if: github.event.repository.private == false
     name: JavaScript and TypeScript analysis
     runs-on: blacksmith-2vcpu-ubuntu-2404
     timeout-minutes: 20
