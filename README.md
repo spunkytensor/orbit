@@ -28,7 +28,8 @@ this does not prevent publishing the source repository under Apache-2.0.
 Use Node.js 22.12+ (tested with Node 26).
 
 ```sh
-node scripts/check-release-age.mjs && npm ci
+node scripts/setup-npm.mjs
+npm run deps
 npm run dev
 npm test
 npm run build

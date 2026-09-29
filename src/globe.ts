@@ -112,7 +112,8 @@ export async function createGlobe(
     pixelOffset: new Cartesian2(0, -18),
   });
   const earthOccluder = new Occluder(new BoundingSphere(Cartesian3.ZERO, 1), Cartesian3.ZERO);
-  scene.preUpdate.addEventListener((_scene, time) => {
+  // preUpdate also fires on idle ticks; only calculate lunar state when drawing.
+  scene.preRender.addEventListener((_scene, time) => {
     moonLabel.position = moonPosition(time);
     Matrix4.fromTranslation(moonLabel.position, moonFill.modelMatrix);
     earthOccluder.cameraPosition = scene.globe.ellipsoid.transformPositionToScaledSpace(camera.positionWC);

@@ -4,6 +4,8 @@ on:
   push:
     branches: [main]
   pull_request:
+  release:
+    types: [published]
   schedule:
     - cron: '17 8 * * 1'
   workflow_dispatch:
@@ -12,13 +14,13 @@ permissions:
   contents: read
 
 concurrency:
-  group: security-${{ github.ref }}
+  group: security-${{ github.event_name }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
   supply-chain:
     name: Audit npm dependencies and generate SBOM
-    runs-on: ubuntu-latest
+    runs-on: blacksmith-2vcpu-ubuntu-2404
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
@@ -28,7 +30,7 @@ jobs:
         with:
           node-version: 24
       - name: Pin npm security tooling
-        run: npm install --global npm@11.6.2 --ignore-scripts --no-audit --no-fund
+        run: node scripts/setup-npm.mjs
       - name: Generate lockfile CycloneDX SBOM
         run: |
           mkdir -p reports/security
@@ -50,3 +52,22 @@ jobs:
           path: reports/security/
           retention-days: 30
           if-no-files-found: warn
+
+  release-evidence:
+    if: github.event_name == 'release'
+    needs: supply-chain
+    runs-on: blacksmith-2vcpu-ubuntu-2404
+    timeout-minutes: 5
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
+        with:
+          name: npm-supply-chain-artifacts
+          path: reports/security
+      - name: Retain security evidence with the published release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+        run: gh release upload "$RELEASE_TAG" reports/security/* --clobber
