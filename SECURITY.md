@@ -34,12 +34,18 @@ CONTRIBUTING.md use `npm run deps` for the same preflight with lifecycle scripts
 disabled; bare npm commands can bypass the preflight. Engine guards reject npm
 versions below 11.10.0. The pinned npm bootstrap itself verifies publication age.
 
-`.github/workflows/security.yml` adapts Reel Maestro's separate audit and
-CycloneDX evidence pattern to npm. It scans the complete committed lockfile,
+`.github/workflows/public-repo-security.yml` is named **Spunky Tensor security**.
+It calls the shared Trivy workflow pinned to
+`69b5f260fb4358acb0e2f7b2a96254ad9cc2322c` and retains the separate npm audit and
+CycloneDX evidence. The npm audit scans the complete committed lockfile,
 including development and optional dependencies, without installing project
 packages or executing their lifecycle scripts. The npm version pinned in
-`package.json` supplies both scanners.
-Audits run on PRs, pushes to `main`, Mondays at 08:17 UTC, and manual dispatch.
+`package.json` supplies the npm audit and npm SBOM tooling.
+Both scans run on PRs, pushes to `main`, published releases, nightly at 09:29 UTC,
+and manual dispatch. Dependency review additionally gates PR dependency changes.
+Trivy includes development dependencies, rejects empty inventories, retains all
+severities, and blocks High/Critical findings including unfixed vulnerabilities.
+Caller ignore/config files cannot suppress its shared policy.
 
 High and critical advisories fail the audit job; low and moderate findings remain
 visible in the JSON report and require triage. Scanner/service failures also fail
@@ -60,8 +66,9 @@ CodeQL runs JavaScript/TypeScript security-extended analysis on PRs, `main`, wee
 and on demand. Findings appear in GitHub code scanning; successful analysis alone
 does not mean no vulnerabilities were found. Actions use immutable commit pins,
 read-only permissions except CodeQL result upload and the release-only evidence
-upload, and bounded job timeouts. All jobs use Blacksmith Ubuntu 24.04 runners;
-the repository must have access to the organization's Blacksmith integration.
+upload, and bounded job timeouts. Existing npm, regression, and CodeQL jobs use
+Blacksmith Ubuntu 24.04 runners; the repository must have access to that
+integration. Trivy and dependency review use GitHub-hosted Ubuntu 24.04.
 
 Maintainers should enable dependency graph/Dependabot alerts, private vulnerability
 reporting, secret scanning and push protection in GitHub settings where available.
@@ -71,6 +78,51 @@ not enforce branch protection. CodeQL requires code scanning enabled (and GitHub
 Code Security entitlement if the repository becomes private). Do not enable both
 default CodeQL setup and this advanced workflow. Repository settings are not
 changed by these files.
+
+## Baseline adoption and remaining gates
+
+Maintainer: Matt Curfman / Spunky Tensor. Supported code remains the latest default
+branch only, as described above; there are no separately supported release lines.
+The [shared baseline](https://github.com/spunkytensor/.github/blob/69b5f260fb4358acb0e2f7b2a96254ad9cc2322c/docs/baseline.md)
+defines adoption requirements, not a compliance certification.
+
+Trivy's `security-source` artifact retains SPDX and CycloneDX SBOMs, full JSON,
+scanner/database version information, source/run identity, and report checksums
+for 30 days. Successful release-tag scans attach that evidence alongside the
+existing npm evidence to [release downloads](https://github.com/spunkytensor/orbit/releases).
+Those are **source/build inventories**, not SBOMs or attestations of a deployed
+bundle. No published releases existed at adoption; the release-only upload path
+still needs validation on an authorized release.
+
+Orbit distributes source and a static `dist/` browser bundle, not a container or
+npm package. Build checks reconcile installed runtime versions and copied notices
+with the lockfile. Cesium bundles additional code, workers, WASM and assets under
+its full upstream notices. Trivy cannot establish complete coverage of that
+bundle or the photographs and branding. Remote fonts, imagery and geocoding are
+obtained by the browser, not shipped by Orbit; their terms still apply.
+
+Before claiming full adoption, maintainers must:
+
+- Verify dependency graph, alerts/security updates, private reporting, secret
+  scanning/push protection, branch and code-scanning rules, workflow/policy owners,
+  2FA and access reviews. Require the real Trivy and dependency-review check names
+  alongside existing npm and regression checks; do not remove stronger checks.
+- Establish and test the private reporting route. Assign vulnerability findings
+  an owner and remediation date; exceptions also need reviewer, scope, evidence,
+  expiry and tracking reference. The shared scanner currently has no exceptions.
+- Reconcile both SBOM formats with actual released bundle files (including nested
+  Cesium components and non-code assets), publish bundle checksums and notices,
+  and bind provenance/attestations to the exact distributed digest. Source SBOM
+  checksums are not bundle checksums. Add immutable released-artifact rescanning
+  if supported releases are introduced; rebuilding main is not a substitute.
+- Review missing dependency license files and photo/branding provenance and
+  service terms in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md). Automated
+  packaging checks are not legal clearance; ORT/ScanCode attribution review is
+  still pending.
+- Verify the first successful nightly run after merge and connect the shared
+  freshness report to this caller path. Alert on scans older than 36 hours;
+  cron alone is not continuous monitoring. No successful nightly run is claimed
+  by this adoption PR.
 
 ## Deployment security
 

@@ -13,6 +13,8 @@ await mkdir(output, { recursive: true });
 for (const file of ["LICENSE", "NOTICE", "THIRD_PARTY_NOTICES.md", "PRIVACY.md"]) {
   await copyFile(join(root, file), join(output, file));
 }
+// Keep the reviewed source notices and the baseline's distributable filename.
+await copyFile(join(root, "THIRD_PARTY_NOTICES.md"), join(output, "THIRD_PARTY_NOTICES.txt"));
 
 const inventory = [];
 for (const [path, entry] of Object.entries(lock.packages)) {
