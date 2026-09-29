@@ -21,7 +21,7 @@
   },
   "dependencies": {
     "cesium": "^1.130.0",
-    "lucide": "^0.468.0"
+    "lucide": "^1.48.0"
   },
   "devDependencies": {
     "typescript": "^5.8.3",
