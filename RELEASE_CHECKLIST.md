@@ -18,10 +18,9 @@ security audit has already occurred.
 - [ ] Review the complete Git history and release files for secrets and private
   information using an approved secret scanner. Rotate any exposed credentials;
   adding ignore rules does not remediate history.
-- [ ] Run `npm ci`, `npm test`, `npm run build`, and `npm audit`. At preparation,
-  runtime audit was clean; full audit reported two moderate findings involving
-  Vitest / `@vitest/mocker` (GHSA-82fw-gwwq-j7x9). Resolve or explicitly assess
-  these before release; the suggested forced fix is a major-version upgrade.
+- [ ] Run `node scripts/setup-npm.mjs`, `npm run deps`, `npm test`,
+  `npm run build`, and `npm audit`. Assess every current advisory before release;
+  the CI audit only blocks high and critical findings.
 - [ ] Review generated `dist/licenses/`, including upstream Cesium notices and
   any packages reported without a standalone license file. Retain these files
   with all deployed bundles. Recheck notices on dependency upgrades.
@@ -33,3 +32,5 @@ security audit has already occurred.
 - [ ] Deploy `dist/` over HTTPS; verify workers/assets, external services, security
   headers, and deployment-specific privacy disclosures. Do not serve dev tools.
 - [ ] Publish a version/tag and release notes only after the above checks pass.
+- [ ] Verify the release's security workflow succeeds and attaches the lockfile
+  SBOM and audit evidence to the release. These assets outlive CI artifact expiry.

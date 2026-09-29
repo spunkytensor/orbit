@@ -5,11 +5,12 @@ welcome. Discuss large features or new dependencies with a maintainer first.
 
 ## Local development
 
-Use Node.js 22.12 or newer. Use npm 11.10.0 or newer when resolving dependency
-updates so npm honors the repository's `min-release-age=3` setting:
+Use Node.js 22.12 or newer. Bootstrap the pinned npm version (after verifying
+its publication age); npm versions below 11.10.0 are rejected by the project:
 
 ```sh
-node scripts/check-release-age.mjs && npm ci
+node scripts/setup-npm.mjs
+npm run deps
 npm run dev
 npm test
 npm run build
@@ -26,19 +27,21 @@ Never install a package version published less than 72 hours ago, including
 development, optional, transitive, and security updates. There are no exemptions.
 For updates, use `npm install --package-lock-only --ignore-scripts` (with package
 arguments as needed) or `npm update --package-lock-only --ignore-scripts`, then
-run `node scripts/check-release-age.mjs && npm ci`. Resolve metadata first; do not
+run `npm run deps`. Resolve metadata first; do not
 download new package contents before validating the resulting lockfile.
 
 Bare `npm ci` and unchanged lockfile entries bypass npm's native age filter, so
-always use the preflight command above. CI and orb setup run it before installation.
+always use `npm run deps`. CI and orb setup use this same command, which also
+disables dependency lifecycle scripts.
 It requires live npm registry metadata, fails closed on missing timestamps or
 network errors, and rejects non-registry dependencies whose age cannot be verified.
-Older npm can perform a preflight-approved locked install, but must not resolve
-updates: it does not understand `.npmrc`'s minimum-age setting.
+The npm bootstrap also checks the pinned npm release before downloading it.
+Do not disable the engine guards or use `--force` to bypass these controls.
 
 ## Automated checks
 
-GitHub Actions runs `npm ci`, all Vitest regressions, the strict TypeScript check
+GitHub Actions uses Blacksmith Ubuntu 24.04 runners for all jobs. It runs the
+age-gated install, all Vitest regressions, the strict TypeScript check
 and production build on Node 22 and 24 for pull requests and pushes to `main`.
 After building, run `node --test scripts/check-dist.mjs` to verify emitted JS/CSS,
 Cesium assets, legal documents, and the runtime license inventory. These are
@@ -50,8 +53,9 @@ security checks with the pinned npm version (no project dependency changes):
 
 ```sh
 mkdir -p reports/security
-npx --yes npm@11.6.2 sbom --package-lock-only --sbom-format=cyclonedx --sbom-type=application > reports/security/orbit-sbom.cdx.json
-npx --yes npm@11.6.2 audit --package-lock-only --audit-level=high --json > reports/security/npm-audit.json
+node scripts/setup-npm.mjs
+npm sbom --package-lock-only --sbom-format=cyclonedx --sbom-type=application > reports/security/orbit-sbom.cdx.json
+npm audit --package-lock-only --audit-level=high --json > reports/security/npm-audit.json
 ```
 
 See [SECURITY.md](SECURITY.md#automated-security-checks) for the gating policy and
@@ -60,7 +64,7 @@ Actions updates; review them and require the same regression checks as other PRs
 
 ## Amp orbs
 
-`.agents/setup` checks the orb's preinstalled Node.js (22.12+) and npm, then
+`.agents/setup` checks the orb's preinstalled Node.js (22.12+), bootstraps pinned npm, then
 installs locked dependencies, including build and test tools. Amp snapshots this
 environment: an exact snapshot skips setup, while a stale snapshot reruns the
 install using npm's preserved download cache. No secrets, environment files,
