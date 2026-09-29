@@ -21,6 +21,49 @@ you own or have permission to test. Do not probe upstream imagery or search
 services as part of a report to this project. Coordinate public disclosure with
 the maintainer after a fix or mitigation is available.
 
+## Automated security checks
+
+All npm package versions must be at least 72 hours old before installation.
+`.npmrc` filters new resolutions with npm 11.10.0+, and CI/orb setup validate
+every locked version against live registry publication timestamps before `npm ci`.
+Missing metadata, unsupported sources, and registry failures block installation.
+Dependabot has a three-day version-update cooldown; its security updates bypass
+that cooldown but do not bypass our CI check. Require both regression jobs in
+branch protection to enforce this on merges. Local installation instructions in
+CONTRIBUTING.md use the same preflight; bare npm commands can bypass it.
+
+`.github/workflows/security.yml` adapts Reel Maestro's separate audit and
+CycloneDX evidence pattern to npm. It scans the complete committed lockfile,
+including development and optional dependencies, without installing project
+packages or executing their lifecycle scripts. npm 11.6.2 supplies both scanners.
+Audits run on PRs, pushes to `main`, Mondays at 08:17 UTC, and manual dispatch.
+
+High and critical advisories fail the audit job; low and moderate findings remain
+visible in the JSON report and require triage. Scanner/service failures also fail
+the job. There are no advisory exclusions. Any future exception must identify the
+advisory, affected package, reachability, responsible owner, rationale, and expiry
+or reassessment condition; do not silently omit development dependencies.
+
+The `npm-supply-chain-artifacts` artifact retains `orbit-sbom.cdx.json`,
+`npm-audit.json`, and `npm-audit.exit-code` for 30 days, including on failed runs
+when the files were produced. The SBOM inventories build and runtime dependencies;
+it is not a claim that all listed packages ship to the browser. License inventory
+checks verify packaging, not a legal license allowlist or approval.
+
+CodeQL runs JavaScript/TypeScript security-extended analysis on PRs, `main`, weekly,
+and on demand. Findings appear in GitHub code scanning; successful analysis alone
+does not mean no vulnerabilities were found. Actions use immutable commit pins,
+read-only permissions except CodeQL result upload, and bounded job timeouts.
+
+Maintainers should enable dependency graph/Dependabot alerts, private vulnerability
+reporting, secret scanning and push protection in GitHub settings where available.
+Configure branch rules to require both Node regression jobs and the npm audit,
+and a code-scanning merge protection rule for CodeQL findings. Workflows alone do
+not enforce branch protection. CodeQL requires code scanning enabled (and GitHub
+Code Security entitlement if the repository becomes private). Do not enable both
+default CodeQL setup and this advanced workflow. Repository settings are not
+changed by these files.
+
 ## Deployment security
 
 - Deploy only the production `dist/` output over HTTPS. Do not expose Vite's

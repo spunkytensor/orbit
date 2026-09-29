@@ -5,10 +5,11 @@ welcome. Discuss large features or new dependencies with a maintainer first.
 
 ## Local development
 
-Use Node.js 22.12 or newer and npm:
+Use Node.js 22.12 or newer. Use npm 11.10.0 or newer when resolving dependency
+updates so npm honors the repository's `min-release-age=3` setting:
 
 ```sh
-npm ci
+node scripts/check-release-age.mjs && npm ci
 npm run dev
 npm test
 npm run build
@@ -18,6 +19,44 @@ The build runs TypeScript checking. There is currently no separate lint or forma
 command; match the surrounding TypeScript and CSS style. Keep `package-lock.json`
 in sync when changing dependencies. Do not commit `node_modules/`, `dist/`, secrets,
 or local environment files.
+
+### Three-day dependency quarantine
+
+Never install a package version published less than 72 hours ago, including
+development, optional, transitive, and security updates. There are no exemptions.
+For updates, use `npm install --package-lock-only --ignore-scripts` (with package
+arguments as needed) or `npm update --package-lock-only --ignore-scripts`, then
+run `node scripts/check-release-age.mjs && npm ci`. Resolve metadata first; do not
+download new package contents before validating the resulting lockfile.
+
+Bare `npm ci` and unchanged lockfile entries bypass npm's native age filter, so
+always use the preflight command above. CI and orb setup run it before installation.
+It requires live npm registry metadata, fails closed on missing timestamps or
+network errors, and rejects non-registry dependencies whose age cannot be verified.
+Older npm can perform a preflight-approved locked install, but must not resolve
+updates: it does not understand `.npmrc`'s minimum-age setting.
+
+## Automated checks
+
+GitHub Actions runs `npm ci`, all Vitest regressions, the strict TypeScript check
+and production build on Node 22 and 24 for pull requests and pushes to `main`.
+After building, run `node --test scripts/check-dist.mjs` to verify emitted JS/CSS,
+Cesium assets, legal documents, and the runtime license inventory. These are
+offline packaging checks, not a browser/WebGL end-to-end test; the manual browser
+checks below still apply. JUnit results are retained for 14 days.
+
+The CVE/SBOM workflow also runs weekly and on manual dispatch. Reproduce its
+security checks with the pinned npm version (no project dependency changes):
+
+```sh
+mkdir -p reports/security
+npx --yes npm@11.6.2 sbom --package-lock-only --sbom-format=cyclonedx --sbom-type=application > reports/security/orbit-sbom.cdx.json
+npx --yes npm@11.6.2 audit --package-lock-only --audit-level=high --json > reports/security/npm-audit.json
+```
+
+See [SECURITY.md](SECURITY.md#automated-security-checks) for the gating policy and
+repository settings needed to enforce it. Dependabot opens weekly npm and GitHub
+Actions updates; review them and require the same regression checks as other PRs.
 
 ## Amp orbs
 

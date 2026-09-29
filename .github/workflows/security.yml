@@ -1,0 +1,52 @@
+name: CVE Audit and SBOM
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  schedule:
+    - cron: '17 8 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: security-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  supply-chain:
+    name: Audit npm dependencies and generate SBOM
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: 24
+      - name: Pin npm security tooling
+        run: npm install --global npm@11.6.2 --ignore-scripts --no-audit --no-fund
+      - name: Generate lockfile CycloneDX SBOM
+        run: |
+          mkdir -p reports/security
+          npm sbom --package-lock-only --sbom-format=cyclonedx --sbom-type=application > reports/security/orbit-sbom.cdx.json
+      - name: Audit all dependencies, including development tools
+        if: ${{ !cancelled() }}
+        run: |
+          mkdir -p reports/security
+          set +e
+          npm audit --package-lock-only --audit-level=high --json > reports/security/npm-audit.json
+          status=$?
+          echo "$status" > reports/security/npm-audit.exit-code
+          exit "$status"
+      - name: Upload security evidence even on failure
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: npm-supply-chain-artifacts
+          path: reports/security/
+          retention-days: 30
+          if-no-files-found: warn
