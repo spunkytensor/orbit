@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Matt Curfman, Spunky Tensor LLC
 // SPDX-License-Identifier: Apache-2.0
 
+import { inject } from "@vercel/analytics";
 import {
   createIcons,
   Search,
@@ -28,6 +29,9 @@ import {
 import "cesium/Build/Cesium/Widgets/widgets.css";
 import "./style.css";
 import { createGlobe, type Globe } from "./globe";
+
+// Initialize Vercel Web Analytics
+inject();
 import {
   places,
   parseCoordinates,
