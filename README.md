@@ -46,6 +46,8 @@ Package versions must be at least 72 hours old before installation. Use npm
 
 Deploy the generated `dist/` directory to a static web host at its root. The build copies Cesium workers, star maps, and the Natural Earth fallback into `dist/cesium/`; keep that directory with the app. No backend is required. External imagery and search need an Internet connection and a browser with WebGL enabled.
 
+The production site, https://orbit.spunkytensor.ai, is hosted on Vercel. [`vercel.json`](vercel.json) runs the same age-checked install, build, and `dist/` checks as CI, and sets security headers, including a Content Security Policy that allows only the external services listed below. Cesium's Knockout bindings need `'unsafe-eval'`. If you add a new external service, add its origin to the policy. To attach the domain, add `orbit.spunkytensor.ai` under the Vercel project's **Settings → Domains**, then create the DNS `CNAME` record that Vercel shows.
+
 The build also preserves project and installed runtime dependency license notices
 in `dist/licenses/`. Keep this directory with every deployed or redistributed
 bundle and review `inventory.json` for packages lacking standalone license files.
