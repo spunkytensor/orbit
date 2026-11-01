@@ -1,0 +1,26 @@
+# SPDX-FileCopyrightText: 2026 Matt Curfman, Spunky Tensor LLC
+# SPDX-License-Identifier: Apache-2.0
+
+# Matt Curfman is the sole maintainer (see SECURITY.md and the commit history).
+# The last matching pattern wins, so the explicit entries below keep workflow
+# and policy files owned even if the default changes.
+* @mattcurf
+
+# Workflows, Dependabot, and this file
+/.github/ @mattcurf
+
+# Security, supply-chain, legal, and contribution policy
+/SECURITY.md @mattcurf
+/PRIVACY.md @mattcurf
+/CONTRIBUTING.md @mattcurf
+/RELEASE_CHECKLIST.md @mattcurf
+/LICENSE @mattcurf
+/NOTICE @mattcurf
+/THIRD_PARTY_NOTICES.md @mattcurf
+/.npmrc @mattcurf
+/scripts/check-release-age.mjs @mattcurf
+/scripts/setup-npm.mjs @mattcurf
+/scripts/copy-licenses.mjs @mattcurf
+
+# Orb setup scripts
+/.agents/ @mattcurf
