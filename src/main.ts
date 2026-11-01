@@ -246,7 +246,7 @@ function toggleLayers(show: boolean) {
   $("#layers-panel").hidden = !show;
   $("#layers").setAttribute("aria-expanded", String(show));
 }
-$("#layers").onclick = () => toggleLayers($("#layers-panel").hidden);
+$("#layers").onclick = () => toggleLayers($("#layers-panel").hidden !== false);
 $("#close-layers").onclick = () => toggleLayers(false);
 document.querySelectorAll<HTMLButtonElement>("[data-layer]").forEach(
   (button) =>

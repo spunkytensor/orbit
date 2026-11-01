@@ -11,6 +11,8 @@ export default defineConfig({
       targets: ["Workers", "Assets", "Widgets", "ThirdParty"].map((folder) => ({
         src: `node_modules/cesium/Build/Cesium/${folder}`,
         dest: "cesium",
+        // Strip node_modules/cesium/Build/Cesium so files land at /cesium/<folder>/.
+        rename: { stripBase: 4 },
       })),
     }),
   ],
