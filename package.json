@@ -10,7 +10,11 @@
     "npm": ">=11.10.0"
   },
   "devEngines": {
-    "packageManager": { "name": "npm", "version": ">=11.10.0", "onFail": "error" }
+    "packageManager": {
+      "name": "npm",
+      "version": ">=11.10.0",
+      "onFail": "error"
+    }
   },
   "scripts": {
     "deps": "node scripts/check-release-age.mjs && npm ci --ignore-scripts --no-audit --no-fund",
@@ -20,6 +24,7 @@
     "test": "vitest run"
   },
   "dependencies": {
+    "@vercel/analytics": "^2.0.1",
     "cesium": "^1.130.0",
     "lucide": "^1.63.0"
   },
