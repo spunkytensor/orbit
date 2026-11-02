@@ -20,7 +20,7 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "cesium": "^1.130.0",
+    "cesium": "^1.146.0",
     "lucide": "^1.63.0"
   },
   "devDependencies": {
